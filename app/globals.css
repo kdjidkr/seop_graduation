@@ -1,26 +1,74 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+@theme {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Custom Fonts */
+  --font-jua: var(--font-jua);
+  --font-gamja: var(--font-gamja);
+  --font-galmuri: var(--font-galmuri);
+
+  /* Custom Colors */
+  --color-paper: #FEFCE8;
+  --color-brown-50: #fdf8f6;
+  --color-brown-900: #422006;
+
+  /* Background Images */
+  --background-image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
+  --background-image-gradient-conic: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops));
 }
 
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+*/
+@layer base {
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+:root {
+  --background: #fdf8f6;
+  /* brown-50 */
+  --foreground: #422006;
+  /* brown-900 */
+}
+
+/* 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+} 
+*/
+
+@font-face {
+  font-family: 'Galmuri11';
+  src: url('/fonts/Galmuri11.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Galmuri11', var(--font-jua), Arial, Helvetica, sans-serif;
+}
+
+@utility pixel-corners {
+  box-shadow:
+    -4px 0 0 0 black,
+    4px 0 0 0 black,
+    0 -4px 0 0 black,
+    0 4px 0 0 black;
+  margin: 4px;
 }
