@@ -29,7 +29,7 @@ export async function uploadPhoto(formData: FormData) {
     }
 
     // 2. Insert into Database
-    const { error: dbError } = await supabase
+    const { error: dbError } = await (supabase as any)
         .from('photos')
         .insert({
             author_name,

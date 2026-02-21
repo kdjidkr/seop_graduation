@@ -21,7 +21,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const login = (password: string) => {
-        if (password === 'dltmdtjq123!') {
+        const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+        if (adminPassword && password === adminPassword) {
             setIsAdmin(true);
             localStorage.setItem('is_seungseop_admin', 'true');
             return true;

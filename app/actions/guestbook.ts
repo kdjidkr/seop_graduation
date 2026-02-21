@@ -15,9 +15,8 @@ export async function addLetter(formData: FormData) {
         return { error: 'Please fill in all required fields.' };
     }
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
         .from('letters')
-        // @ts-ignore
         .insert({
             author_name,
             content,
@@ -40,7 +39,7 @@ export async function deleteLetter(id: string, password: string) {
     }
 
     // First, verify password
-    const { data: letter, error: fetchError } = await supabase
+    const { data: letter, error: fetchError } = await (supabase as any)
         .from('letters')
         .select('password')
         .eq('id', id)
@@ -55,7 +54,7 @@ export async function deleteLetter(id: string, password: string) {
     }
 
     // If password matches, delete
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await (supabase as any)
         .from('letters')
         .delete()
         .eq('id', id);

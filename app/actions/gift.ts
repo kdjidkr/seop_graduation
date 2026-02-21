@@ -11,7 +11,7 @@ export async function createGift(formData: {
     barcode_number: string;
     is_public?: boolean;
 }) {
-    const { error } = await supabase
+    const { error } = await (supabase as any)
         .from('gifts')
         .insert({
             name: formData.name,
@@ -33,7 +33,7 @@ export async function createGift(formData: {
 
 export async function deleteGift(giftId: string, password: string) {
     // 1. Verify password
-    const { data: gift, error: fetchError } = await supabase
+    const { data: gift, error: fetchError } = await (supabase as any)
         .from('gifts')
         .select('password')
         .eq('id', giftId)
@@ -48,7 +48,7 @@ export async function deleteGift(giftId: string, password: string) {
     }
 
     // 2. Delete
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await (supabase as any)
         .from('gifts')
         .delete()
         .eq('id', giftId);
