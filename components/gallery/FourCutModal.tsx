@@ -223,7 +223,7 @@ export function FourCutModal({ isOpen, onClose }: FourCutModalProps) {
                     }
                 });
             };
-            frameImg.src = '/photo_booth/frame.jpeg?v=1';
+            frameImg.src = '/photo_booth/frame.JPEG?v=1';
         });
     };
 
