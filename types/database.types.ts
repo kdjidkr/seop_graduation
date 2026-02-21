@@ -45,6 +45,11 @@ export type Database = {
                     name: string
                     image_url: string | null
                     selected_by_brother: boolean
+                    sender_name: string | null
+                    password: string | null
+                    expires_at: string | null
+                    barcode_number: string | null
+                    is_public: boolean
                 }
                 Insert: {
                     id?: string
@@ -52,6 +57,11 @@ export type Database = {
                     name: string
                     image_url?: string | null
                     selected_by_brother?: boolean
+                    sender_name?: string | null
+                    password?: string | null
+                    expires_at?: string | null
+                    barcode_number?: string | null
+                    is_public?: boolean
                 }
                 Update: {
                     id?: string
@@ -59,6 +69,11 @@ export type Database = {
                     name?: string
                     image_url?: string | null
                     selected_by_brother?: boolean
+                    sender_name?: string | null
+                    password?: string | null
+                    expires_at?: string | null
+                    barcode_number?: string | null
+                    is_public?: boolean
                 }
             }
             photos: {
@@ -68,6 +83,8 @@ export type Database = {
                     storage_path: string
                     author_name: string | null
                     caption: string | null
+                    is_public: boolean
+                    password: string | null
                 }
                 Insert: {
                     id?: string
@@ -75,6 +92,8 @@ export type Database = {
                     storage_path: string
                     author_name?: string | null
                     caption?: string | null
+                    is_public?: boolean
+                    password?: string | null
                 }
                 Update: {
                     id?: string
@@ -82,6 +101,8 @@ export type Database = {
                     storage_path?: string
                     author_name?: string | null
                     caption?: string | null
+                    is_public?: boolean
+                    password?: string | null
                 }
             }
             app_config: {

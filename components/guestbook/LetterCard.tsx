@@ -1,40 +1,47 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { format } from 'date-fns';
 import { Database } from '@/types/database.types';
+import Image from 'next/image';
 
 type Letter = Database['public']['Tables']['letters']['Row'];
 
-export function LetterCard({ letter, index }: { letter: Letter; index: number }) {
-    // Random rotation for sticky note feel
-    const rotation = index % 2 === 0 ? 1 : -1;
+interface LetterCardProps {
+    letter: Letter;
+    index: number;
+    pokemonName?: string | null;
+    onClick: () => void;
+}
 
+export function LetterCard({ letter, index, pokemonName, onClick }: LetterCardProps) {
+    const displayName = letter.is_public ? letter.author_name : `${pokemonName || '???'}`;
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: index * 0.05 }}
-            whileHover={{ y: -5, rotate: 0 }}
-            className={`bg-yellow-100 p-6 shadow-md hover:shadow-xl transition-all duration-300 transform rotate-${rotation} relative min-h-[200px] flex flex-col justify-between bordered-brown-50`}
-            style={{
-                transform: `rotate(${rotation}deg)`,
-            }}
+            whileHover={{ y: -5, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={onClick}
+            className="cursor-pointer relative group flex flex-col items-center"
         >
-            {/* Tape effect */}
-            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-24 h-6 bg-white/40 rotate-1 shadow-sm backdrop-blur-sm"></div>
-
-            <div className="font-gamja text-lg text-brown-900 leading-relaxed whitespace-pre-wrap">
-                {letter.content}
+            <div className="relative w-full aspect-[4/3] drop-shadow-md group-hover:drop-shadow-xl transition-all duration-300">
+                <Image
+                    src="/envelop.png"
+                    alt="Letter Envelope"
+                    fill
+                    className="object-contain"
+                />
             </div>
 
-            <div className="mt-4 flex justify-between items-end border-t border-brown-900/10 pt-2">
-                <div className="font-jua text-brown-900 text-lg">
-                    - {letter.author_name}
-                </div>
-                <div className="text-xs text-brown-900/40 font-mono">
-                    {format(new Date(letter.created_at), 'yy.MM.dd')}
-                </div>
+            <div className={`mt-4 px-4 py-1.5 rounded-full border border-gray-100 transition-all duration-300 shadow-sm ${letter.is_public
+                    ? "bg-gray-50/80 backdrop-blur-sm group-hover:bg-orange-50/50 group-hover:border-orange-200"
+                    : "bg-gray-50/50 backdrop-blur-sm border-gray-100 group-hover:bg-gray-100/80 group-hover:border-gray-300"
+                }`}>
+                <p className={`font-jua text-lg whitespace-nowrap transition-colors ${letter.is_public ? "text-gray-600 group-hover:text-orange-600" : "text-gray-400 group-hover:text-black"
+                    }`}>
+                    {letter.is_public ? `${displayName} 님` : `${displayName}의 편지 🔒`}
+                </p>
             </div>
         </motion.div>
     );

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/utils/cn';
 import Image from 'next/image';
+import { useAudio } from '@/context/AudioContext';
 
 type BattleState =
     | 'ENCOUNTER' // Wild Hanyang appeared!
@@ -18,11 +19,13 @@ type BattleState =
     | 'LEVEL_UP'  // Cyndaquil grew to Lv. 27!
     | 'EVOLUTION' // Evolution sequence
     | 'EVOLVED'   // Finished evolution
+    | 'RUN_AWAY'  // Escape sequence
     | 'FINISHED'; // Transition to main site
 
 export function PokemonBattle({ onComplete }: { onComplete: () => void }) {
     const [mounted, setMounted] = useState(false);
     const [battleState, setBattleState] = useState<BattleState>('ENCOUNTER');
+    const { isMuted } = useAudio();
 
     // State for sequence control
     const [dialogText, setDialogText] = useState('');
@@ -54,8 +57,10 @@ export function PokemonBattle({ onComplete }: { onComplete: () => void }) {
     }, []);
 
     // HP Stats
-    const maxHp = 50;
-    const [hanyangHp, setHanyangHp] = useState(maxHp);
+    const enemyMaxHp = 50;
+    const [hanyangHp, setHanyangHp] = useState(enemyMaxHp);
+    const [cyndaquilMaxHp, setCyndaquilMaxHp] = useState(50);
+    const [cyndaquilCurrentHp, setCyndaquilCurrentHp] = useState(50);
 
     // Typewriter effect helper
     const typeText = async (text: string, delay = 50) => {
@@ -90,8 +95,17 @@ export function PokemonBattle({ onComplete }: { onComplete: () => void }) {
         };
     }, [mounted]);
 
+    // Volume Control for BGM
+    useEffect(() => {
+        const bgm = (window as any).battleBgm;
+        if (bgm) {
+            bgm.volume = isMuted ? 0 : 0.4;
+        }
+    }, [isMuted]);
+
     // Helper to play SFX
     const playSfx = (filename: string) => {
+        if (isMuted) return;
         const audio = new Audio(`/sounds/${filename}`);
         audio.volume = 0.6;
         audio.play().catch(e => console.log('Audio play failed', e));
@@ -216,12 +230,15 @@ export function PokemonBattle({ onComplete }: { onComplete: () => void }) {
                     setExpPercent(100);
                     await new Promise((r) => setTimeout(r, 800)); // Wait for fill animation
 
-                    // 3. Pause for 1s with FULL BAR
-                    await new Promise((r) => setTimeout(r, 1000));
-
-                    // 4. Level Up Number Update & Sound (Restored per request)
+                    // 3. Level Up Stats & Sound
                     setCyndaquilLevel(i);
+                    setCyndaquilMaxHp(prev => prev + 12);
+                    setCyndaquilCurrentHp(prev => prev + 12); // Restore full on level up
+
                     playSfx('levelup.mp3');
+
+                    // 4. Pause for 1s with FULL BAR
+                    await new Promise((r) => setTimeout(r, 1000));
 
                     // Small pause before next loop reset
                     await new Promise((r) => setTimeout(r, 200));
@@ -289,6 +306,12 @@ export function PokemonBattle({ onComplete }: { onComplete: () => void }) {
                 // playSfx('levelup.mp3'); // Sound Removed per request
                 if (scriptActive) await typeText('축하합니다! 섭승이가 대졸 섭승이로 진화했습니다!');
             }
+            else if (battleState === 'RUN_AWAY') {
+                playSfx('pokemon-run-away.mp3');
+                if (scriptActive) await typeText('무사히 홈으로 도망쳤다!');
+                await new Promise((r) => setTimeout(r, 1500));
+                if (scriptActive) onComplete();
+            }
         };
 
         runSequence();
@@ -333,6 +356,10 @@ export function PokemonBattle({ onComplete }: { onComplete: () => void }) {
     const handleAttack = () => {
         playSfx('button_selection.mp3');
         setBattleState('ATTACK');
+    };
+
+    const handleRun = () => {
+        setBattleState('RUN_AWAY');
     };
 
     if (!mounted) return null;
@@ -524,11 +551,11 @@ export function PokemonBattle({ onComplete }: { onComplete: () => void }) {
                                 {/* HP Bar Container */}
                                 <div className="flex items-center gap-1 pl-2" style={{ transform: 'skewX(15deg)' }}>
                                     <div className="bg-[#303030] text-[#f8b050] font-black text-[10px] px-1 rounded-[2px] tracking-wider border border-[#a0a0a0]">HP</div>
-                                    <div className="flex-1 h-3 bg-[#505050] rounded-full p-[2px] overflow-hidden border border-white/50">
+                                    <div className="flex-1 h-[8px] bg-[#505050] rounded-full p-[1px] overflow-hidden border border-white/50">
                                         <motion.div
                                             className="h-full bg-gradient-to-b from-[#50f870] to-[#30d050] rounded-full"
                                             initial={{ width: '100%' }}
-                                            animate={{ width: `${(hanyangHp / maxHp) * 100}%` }}
+                                            animate={{ width: `${(hanyangHp / enemyMaxHp) * 100}%` }}
                                             transition={{ duration: 0.5 }}
                                         />
                                     </div>
@@ -656,29 +683,29 @@ export function PokemonBattle({ onComplete }: { onComplete: () => void }) {
                             {/* Shadow/Border Container */}
                             <div className="relative bg-black/40 p-0.5 sm:p-1" style={{ transform: 'skewX(-15deg)' }}>
                                 {/* Main Box */}
-                                <div className="bg-[#f8f8f0] border-2 border-[#404040] p-1.5 sm:p-3 shadow-inner relative overflow-hidden">
+                                <div className="bg-[#f8f8f0] border-2 border-[#404040] p-1 sm:p-2 shadow-inner relative overflow-hidden">
                                     {/* Dark strip */}
                                     <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-[#e8e8e8] to-[#d0d0d0] -z-10"></div>
 
-                                    <div className="flex justify-between items-baseline mb-1 sm:mb-2 px-2" style={{ transform: 'skewX(15deg)' }}>
+                                    <div className="flex justify-between items-baseline mb-0.5 sm:mb-1 px-2" style={{ transform: 'skewX(15deg)' }}>
                                         <span className="text-black font-extrabold text-lg sm:text-2xl tracking-tighter">섭승이</span>
                                         <span className="text-black font-bold text-base sm:text-lg">Lv.{cyndaquilLevel}</span>
                                     </div>
 
                                     {/* HP Bar */}
-                                    <div className="flex items-center gap-1 mb-1" style={{ transform: 'skewX(15deg)' }}>
+                                    <div className="flex items-center gap-1 mb-0.5" style={{ transform: 'skewX(15deg)' }}>
                                         <div className="bg-[#303030] text-[#f8b050] font-black text-[10px] px-1 rounded-[2px] tracking-wider border border-[#a0a0a0]">HP</div>
-                                        <div className="flex-1 h-3 bg-[#505050] rounded-full p-[2px] overflow-hidden border border-white/50">
+                                        <div className="flex-1 h-[8px] bg-[#505050] rounded-full p-[1px] overflow-hidden border border-white/50">
                                             <div className="h-full bg-gradient-to-b from-[#50f870] to-[#30d050] rounded-full w-full"></div>
                                         </div>
                                     </div>
 
                                     <div className="flex justify-end items-center" style={{ transform: 'skewX(15deg)' }}>
-                                        <div className="text-black font-mono text-xl tracking-widest pl-2">50/ 50</div>
+                                        <div className="text-black font-mono text-lg sm:text-xl tracking-widest pl-2">{cyndaquilCurrentHp}/ {cyndaquilMaxHp}</div>
                                     </div>
 
                                     {/* EXP Bar */}
-                                    <div className="relative mt-1 h-1.5 w-[90%] ml-auto bg-[#506070] overflow-hidden rounded-full border border-white/50" style={{ transform: 'skewX(15deg)' }}>
+                                    <div className="relative mt-1 h-[4px] w-[90%] ml-auto bg-[#506070] overflow-hidden rounded-full border border-white/50" style={{ transform: 'skewX(15deg)' }}>
                                         <motion.div
                                             className="h-full bg-[#40a0f8]"
                                             initial={{ width: '80%' }}
@@ -717,7 +744,10 @@ export function PokemonBattle({ onComplete }: { onComplete: () => void }) {
                                     <button className="bg-[#e0e0e0] border-2 border-[#a0a0a0] text-gray-500 font-bold text-lg rounded cursor-not-allowed">
                                         포켓몬
                                     </button>
-                                    <button className="bg-[#e0e0e0] border-2 border-[#a0a0a0] text-gray-500 font-bold text-lg rounded cursor-not-allowed">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); handleRun(); }}
+                                        className="bg-[#f8f8f0] border-2 border-[#404040] text-black font-bold text-lg rounded active:translate-y-1"
+                                    >
                                         도망친다
                                     </button>
                                 </div>
@@ -766,8 +796,8 @@ export function PokemonBattle({ onComplete }: { onComplete: () => void }) {
                                         포켓몬
                                     </button>
                                     <button
-                                        onClick={(e) => { e.stopPropagation(); playSfx('button_selection.mp3'); }}
-                                        className="bg-[#e0e0e0] border-2 border-[#a0a0a0] text-gray-500 font-bold text-xl rounded cursor-not-allowed active:translate-y-1 transition-all"
+                                        onClick={(e) => { e.stopPropagation(); handleRun(); }}
+                                        className="bg-[#e0e0e0] border-2 border-[#a0a0a0] text-black font-bold text-xl rounded active:translate-y-1 hover:bg-[#d0d0d0] transition-all"
                                     >
                                         도망친다
                                     </button>

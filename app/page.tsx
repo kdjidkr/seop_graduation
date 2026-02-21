@@ -5,12 +5,38 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns';
 import { cn } from '@/utils/cn';
-import { PokemonBattle } from '@/components/intro/PokemonBattle';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { Header } from '@/components/common/Header';
+import { useAudio } from "@/context/AudioContext";
+import { useAdmin } from "@/context/AdminContext";
+import { Lock, LogOut, ShieldCheck, X } from 'lucide-react';
 
 export default function Home() {
-  const [introFinished, setIntroFinished] = useState(false);
+  const { setMuted } = useAudio();
+  const { isAdmin, login, logout } = useAdmin();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [showAdminModal, setShowAdminModal] = useState(false);
+  const [adminPassword, setAdminPassword] = useState('');
+  const [loginError, setLoginError] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const dDay = new Date('2026-02-28T00:00:00'); // Target date
+
+  useEffect(() => {
+    // Automatically mute audio when entering the home screen
+    setMuted(true);
+  }, [setMuted]);
+
+  useEffect(() => {
+    // Intro Redirection Logic
+    const introSeen = localStorage.getItem('intro_seen');
+    if (!introSeen) {
+      router.push('/intro');
+    } else {
+      setLoading(false);
+    }
+  }, [router]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -32,98 +58,153 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
+  const handleAdminLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (login(adminPassword)) {
+      setShowAdminModal(false);
+      setAdminPassword('');
+      setLoginError(false);
+    } else {
+      setLoginError(true);
+    }
+  };
+
+  if (loading) return <div className="min-h-screen bg-white" />;
+
   return (
     <>
-      <AnimatePresence>
-        {!introFinished && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
-            className="fixed inset-0 z-[100]"
-          >
-            <PokemonBattle onComplete={() => setIntroFinished(true)} />
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      <main className="min-h-screen flex flex-col items-center justify-center bg-paper text-brown-900 p-4 relative overflow-hidden">
-        {/* Background decorations */}
-        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-yellow-400 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 right-10 w-48 h-48 bg-orange-400 rounded-full blur-3xl"></div>
-        </div>
+      <main className="min-h-screen flex flex-col bg-white text-gray-900 font-noto">
+        <Header />
 
+        {/* BEGIN: HeroSection */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: introFinished ? 0.5 : 0 }}
-          className="z-10 text-center space-y-12 max-w-2xl w-full"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          className="flex-grow flex flex-col items-center px-4 relative overflow-hidden pt-12"
         >
-          <header className="space-y-4">
-            <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 100, delay: introFinished ? 0.7 : 0.2 }}
-              className="inline-block bg-white/50 backdrop-blur-sm px-6 py-2 rounded-full shadow-sm text-lg font-gamja"
+          {/* Decorative background elements */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange-50 rounded-full blur-3xl opacity-40 -z-10"></div>
+
+          {/* Hero Content Container */}
+          <div className="text-center max-w-4xl w-full flex flex-col items-center">
+            {/* Headline */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="headline-font text-4xl sm:text-6xl md:text-7xl text-gray-900 mb-12 whitespace-nowrap"
             >
-              🎉 2026.02.26 🎉
+              승섭, 졸업 축하해
+            </motion.h1>
+
+            {/* Main Character Image Container */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 100, delay: 0.6 }}
+              className="relative group"
+              data-purpose="hero-character-display"
+            >
+              <Image
+                src="/main_graduation.png"
+                alt="Graduation Cyndaquil holding flowers"
+                width={600}
+                height={600}
+                className="w-full max-w-[600px] h-auto transition-transform duration-500 group-hover:scale-[1.02]"
+                priority
+                unoptimized
+              />
             </motion.div>
-            <h1 className="text-5xl md:text-7xl font-bold font-jua text-brown-900 tracking-tight leading-tight">
-              승섭이의 졸업을<br />축하합니다!
-            </h1>
-            <p className="text-xl text-brown-900/80 font-gamja">
-              멋진 시작을 응원해주세요
-            </p>
-          </header>
-
-          {/* Countdown */}
-          <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
-            {Object.entries(timeLeft).map(([unit, value], index) => (
-              <motion.div
-                key={unit}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: introFinished ? 0.9 + index * 0.1 : 0.4 + index * 0.1 }}
-                className="bg-white/60 backdrop-blur-md rounded-2xl p-4 shadow-lg text-center border bordered-brown-50"
-              >
-                <div className="text-3xl font-jua text-brown-900">
-                  {String(value).padStart(2, '0')}
-                </div>
-                <div className="text-xs uppercase tracking-wider opacity-60 font-semibold mt-1">
-                  {unit}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Navigation */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
-            <Link href="/guestbook" className="w-full sm:w-auto">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-full px-8 py-4 bg-brown-900 text-paper rounded-xl font-jua text-xl shadow-lg hover:shadow-xl transition-shadow"
-              >
-                📜 롤링페이퍼 쓰기
-              </motion.button>
-            </Link>
-            <Link href="/gallery" className="w-full sm:w-auto">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-full px-8 py-4 bg-white text-brown-900 border-2 border-brown-900/10 rounded-xl font-jua text-xl shadow-md hover:shadow-xl transition-shadow"
-              >
-                📸 추억 사진첩
-              </motion.button>
-            </Link>
           </div>
         </motion.div>
+        {/* END: HeroSection */}
 
-        <footer className="absolute bottom-6 text-center text-brown-900/40 text-sm font-gamja">
-          Developed for Seungseop's Graduation
-        </footer>
+        {/* Admin Access Button */}
+        <div className="fixed bottom-8 right-8 z-50">
+          {isAdmin ? (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={logout}
+              className="bg-black/10 backdrop-blur-md text-gray-500 hover:text-red-500 p-4 rounded-full transition-colors flex items-center gap-2 font-manseh text-lg shadow-lg"
+            >
+              <LogOut size={20} />
+              <span>로그아웃</span>
+            </motion.button>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowAdminModal(true)}
+              className="bg-white/10 backdrop-blur-md border border-gray-200 text-gray-400 hover:text-black hover:border-black p-4 px-6 rounded-full transition-all flex items-center gap-2 font-manseh text-xl shadow-xl group"
+            >
+              <ShieldCheck size={22} className="group-hover:text-amber-500" />
+              <span>섭승이로 접속하기</span>
+            </motion.button>
+          )}
+        </div>
+
+        {/* Admin Login Modal */}
+        <AnimatePresence>
+          {showAdminModal && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="bg-white w-full max-w-sm p-8 md:p-10 shadow-2xl relative font-manseh flex flex-col items-center"
+              >
+                <button
+                  onClick={() => {
+                    setShowAdminModal(false);
+                    setLoginError(false);
+                    setAdminPassword('');
+                  }}
+                  className="absolute top-6 right-6 text-gray-400 hover:text-black transition-colors"
+                >
+                  <X size={24} />
+                </button>
+
+                <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mb-6">
+                  <Lock size={32} />
+                </div>
+
+                <h3 className="text-3xl text-gray-900 mb-2">섭승이 접속</h3>
+                <p className="text-gray-500 text-xl mb-8">암호를 대라!</p>
+
+                <form onSubmit={handleAdminLogin} className="w-full space-y-6">
+                  <div className="relative">
+                    <input
+                      type="password"
+                      value={adminPassword}
+                      onChange={(e) => setAdminPassword(e.target.value)}
+                      placeholder="비밀번호 입력..."
+                      className={cn(
+                        "w-full border-b-2 border-gray-100 focus:border-black outline-none py-2 text-2xl text-center tracking-widest placeholder:tracking-normal placeholder:text-gray-200 transition-colors",
+                        loginError && "border-red-500"
+                      )}
+                      autoFocus
+                    />
+                    {loginError && (
+                      <p className="text-red-500 text-center mt-2 text-lg">암호가 틀렸어!</p>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full bg-black text-white py-3 rounded-lg text-2xl hover:bg-gray-800 transition-colors shadow-lg active:scale-[0.98]"
+                  >
+                    접속하기
+                  </button>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </main>
+
     </>
   );
 }

@@ -1,0 +1,6 @@
+public/photo_booth/frame.JPEG: Not found
+public/photo_booth/frame.PNG: 1200x1800
+public/photo_booth/left_up.PNG: 1170x1462
+public/photo_booth/left_down.PNG: 1170x1462
+public/photo_booth/right_up.PNG: 1170x1462
+public/photo_booth/right_down.PNG: 1170x1462

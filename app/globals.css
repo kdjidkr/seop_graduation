@@ -8,6 +8,8 @@
   --font-jua: var(--font-jua);
   --font-gamja: var(--font-gamja);
   --font-galmuri: var(--font-galmuri);
+  --font-manseh: var(--font-manseh);
+  --font-noto: var(--font-noto-sans-kr);
 
   /* Custom Colors */
   --color-paper: #FEFCE8;
@@ -71,4 +73,29 @@ body {
     0 -4px 0 0 black,
     0 4px 0 0 black;
   margin: 4px;
+}
+
+@utility nav-item {
+  position: relative;
+  transition: color 0.3s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: #f59e0b;
+    transition: width 0.3s ease;
+  }
+
+  &:hover::after {
+    width: 100%;
+  }
+}
+
+@utility headline-font {
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }

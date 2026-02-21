@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send } from 'lucide-react';
+import { X, Send, Check } from 'lucide-react';
 import { addLetter } from '@/app/actions/guestbook';
 import { cn } from '@/utils/cn';
 
@@ -29,107 +29,115 @@ export function WriteLetterModal({ isOpen, onClose }: { isOpen: boolean; onClose
         <AnimatePresence>
             {isOpen && (
                 <>
-                    {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/50 z-50 backdrop-blur-sm"
+                        className="fixed inset-0 bg-black/60 z-[110] backdrop-blur-sm"
                     />
 
-                    {/* Modal */}
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none p-4"
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        className="fixed inset-0 flex items-center justify-center z-[120] p-4 pointer-events-none"
                     >
-                        <div className="bg-paper w-full max-w-lg rounded-2xl shadow-2xl p-6 md:p-8 pointer-events-auto relative border-4 border-brown-50">
+                        <div className="bg-white w-full max-w-lg p-8 md:p-12 shadow-2xl relative pointer-events-auto font-manseh flex flex-col min-h-[500px] max-h-[90vh] overflow-y-auto custom-scrollbar">
                             <button
                                 onClick={onClose}
-                                className="absolute top-4 right-4 text-brown-900/50 hover:text-brown-900 transition-colors"
+                                className="absolute top-6 right-6 text-gray-400 hover:text-black transition-colors"
                             >
                                 <X size={24} />
                             </button>
 
-                            <h2 className="text-3xl font-jua text-brown-900 mb-6 text-center">
-                                축하 메시지 남기기 ✍️
-                            </h2>
+                            <form action={handleSubmit} className="flex-grow flex flex-col">
+                                <textarea
+                                    name="content"
+                                    required
+                                    maxLength={500}
+                                    placeholder="승섭이에게 하고 싶은 말을 전해주세요..."
+                                    className="w-full flex-grow bg-transparent text-2xl md:text-3xl placeholder:text-gray-300 focus:outline-none resize-none leading-relaxed tracking-tight mb-4"
+                                />
 
-                            <form action={handleSubmit} className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-gamja text-brown-900/70 mb-1">작성자 이름</label>
-                                    <input
-                                        name="author_name"
-                                        required
-                                        maxLength={20}
-                                        className="w-full bg-white border border-brown-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brown-500 font-gamja text-lg"
-                                        placeholder="친구들이 알 수 있는 닉네임"
-                                    />
-                                </div>
+                                <div className="space-y-3 flex flex-col items-end mt-auto text-xl md:text-2xl text-gray-800">
+                                    <div className="flex items-center gap-2 border-b border-gray-200">
+                                        <span className="shrink-0">-</span>
+                                        <input
+                                            name="author_name"
+                                            required
+                                            maxLength={10}
+                                            placeholder="누구"
+                                            className="bg-transparent focus:outline-none text-right w-24 md:w-32 py-0.5"
+                                        />
+                                        <span className="shrink-0 text-gray-500">가 씀!</span>
+                                    </div>
 
-                                <div>
-                                    <label className="block text-sm font-gamja text-brown-900/70 mb-1">내용</label>
-                                    <textarea
-                                        name="content"
-                                        required
-                                        rows={4}
-                                        maxLength={500}
-                                        className="w-full bg-white border border-brown-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brown-500 font-gamja text-lg resize-none"
-                                        placeholder="승섭이에게 하고 싶은 말을 자유롭게 적어주세요!"
-                                    />
-                                </div>
+                                    <div className="flex items-center gap-2 border-b border-gray-200">
+                                        <span className="shrink-0">- 비밀번호</span>
+                                        <input
+                                            name="password"
+                                            required
+                                            type="password"
+                                            maxLength={4}
+                                            inputMode="numeric"
+                                            pattern="[0-9]*"
+                                            placeholder="xxxx"
+                                            className="bg-transparent focus:outline-none text-center w-16 md:w-20 py-0.5"
+                                        />
+                                    </div>
 
-                                <div>
-                                    <label className="block text-sm font-gamja text-brown-900/70 mb-1">비밀번호 (수정/삭제용)</label>
-                                    <input
-                                        name="password"
-                                        required
-                                        type="password"
-                                        maxLength={6}
-                                        pattern="[0-9]*"
-                                        inputMode="numeric"
-                                        className="w-full bg-white border border-brown-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brown-500 font-mono"
-                                        placeholder="숫자 4자리"
-                                    />
-                                </div>
+                                    <div className="pt-1 w-full flex justify-end">
+                                        <div className="flex items-center gap-3 select-none scale-90 origin-right">
+                                            <div className="relative w-7 h-7 flex items-center justify-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    name="is_private"
+                                                    id="is_private"
+                                                    className="peer sr-only"
+                                                />
+                                                <label
+                                                    htmlFor="is_private"
+                                                    className="absolute inset-0 border-2 border-gray-800 rounded cursor-pointer transition-all"
+                                                ></label>
+                                                <span className="absolute text-3xl text-gray-800 opacity-0 peer-checked:opacity-100 transition-opacity transform -rotate-12 translate-y-[-3px] pointer-events-none">
+                                                    v
+                                                </span>
+                                            </div>
+                                            <label
+                                                htmlFor="is_private"
+                                                className="text-xl text-gray-800 cursor-pointer"
+                                            >
+                                                <span>🔒 승섭이만 보기 (비공개)</span>
+                                            </label>
+                                        </div>
+                                    </div>
 
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        name="is_public"
-                                        id="is_public"
-                                        defaultChecked
-                                        className="w-4 h-4 text-brown-900 rounded focus:ring-brown-500"
-                                    />
-                                    <label htmlFor="is_public" className="text-sm font-gamja text-brown-900/70">
-                                        모두에게 공개할래요
-                                    </label>
+                                    <div className="pt-2">
+                                        <motion.button
+                                            whileHover={{ scale: 1.05, y: -1 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            type="submit"
+                                            disabled={isSubmitting}
+                                            className={cn(
+                                                "text-2xl text-gray-900 transition-colors hover:text-blue-600 font-manseh outline-none border-b-2 border-transparent hover:border-blue-600",
+                                                isSubmitting && "opacity-50 cursor-not-allowed"
+                                            )}
+                                        >
+                                            {isSubmitting ? (
+                                                <div className="w-6 h-6 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
+                                            ) : (
+                                                "보내기"
+                                            )}
+                                        </motion.button>
+                                    </div>
                                 </div>
 
                                 {error && (
-                                    <div className="text-center text-red-500 text-sm font-gamja">
+                                    <div className="mt-4 text-center text-red-500 text-lg">
                                         ⚠️ {error}
                                     </div>
                                 )}
-
-                                <button
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className={cn(
-                                        "w-full bg-brown-900 text-paper rounded-xl py-3 font-jua text-xl shadow-lg flex items-center justify-center gap-2 transition-transform active:scale-95 hover:bg-brown-800",
-                                        isSubmitting && "opacity-70 cursor-not-allowed"
-                                    )}
-                                >
-                                    {isSubmitting ? (
-                                        "저장 중..."
-                                    ) : (
-                                        <>
-                                            보내기 <Send size={20} />
-                                        </>
-                                    )}
-                                </button>
                             </form>
                         </div>
                     </motion.div>

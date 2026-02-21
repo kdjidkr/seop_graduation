@@ -1,6 +1,8 @@
 import { supabase } from '@/utils/supabase/client';
 import Link from 'next/link';
 import { GuestbookClient } from './client';
+import { Header } from '@/components/common/Header';
+import { Home } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,26 +13,28 @@ export default async function GuestbookPage() {
         .order('created_at', { ascending: false });
 
     if (error) {
-        console.error('Error fetching letters:', error);
+        console.error('Supabase fetch error:', error.message);
     }
 
     return (
-        <main className="min-h-screen bg-paper text-brown-900 p-4 md:p-8">
-            <div className="max-w-6xl mx-auto space-y-8">
-                <header className="flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div>
-                        <Link href="/" className="text-brown-900/60 hover:text-brown-900 transition-colors font-gamja text-lg">
-                            ← 홈으로 돌아가기
-                        </Link>
-                        <h1 className="text-4xl md:text-5xl font-jua mt-2 text-brown-900">
-                            축하의 한마디 📜
-                        </h1>
-                        <p className="text-brown-900/80 font-gamja text-lg mt-1">
-                            졸업을 축하하는 마음을 남겨주세요!
-                        </p>
-                    </div>
+        <main className="min-h-screen bg-white text-gray-900 p-6 md:p-12 relative">
+            <Header />
 
-                    {/* Client component will handle the 'Write' button and Modal */}
+            {/* Top-left Home Link */}
+            <div className="absolute top-8 left-8">
+                <Link href="/" className="text-gray-400 hover:text-gray-900 transition-colors font-gamja text-xl flex items-center gap-2">
+                    <Home size={20} /> Home
+                </Link>
+            </div>
+
+            <div className="max-w-5xl mx-auto space-y-12">
+                <header className="flex flex-col items-center gap-4 text-center">
+                    <h1 className="text-4xl md:text-5xl font-noto font-bold tracking-tight text-gray-900">
+                        Letter
+                    </h1>
+                    <p className="text-gray-500 font-gamja text-xl">
+                        축하하는 마음을 가득 담았어요🎓
+                    </p>
                 </header>
 
                 <GuestbookClient initialLetters={(letters as any) || []} />

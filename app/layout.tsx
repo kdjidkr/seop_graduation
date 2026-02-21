@@ -1,10 +1,25 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
+import { AudioProvider } from "@/context/AudioContext";
+import { AdminProvider } from "@/context/AdminContext";
+
+const notoTabsKr = Noto_Sans_KR({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
+  variable: "--font-noto-sans-kr",
+});
 
 const galmuri = localFont({
   src: "../public/fonts/Galmuri11.ttf",
   variable: "--font-galmuri",
+  display: "swap",
+});
+
+const manseh = localFont({
+  src: "../public/fonts/YoonChildfundkoreaManSeh.ttf",
+  variable: "--font-manseh",
   display: "swap",
 });
 
@@ -21,9 +36,13 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body
-        className={`${galmuri.variable} antialiased font-galmuri`}
+        className={`${galmuri.variable} ${notoTabsKr.variable} ${manseh.variable} antialiased font-galmuri`}
       >
-        {children}
+        <AdminProvider>
+          <AudioProvider>
+            {children}
+          </AudioProvider>
+        </AdminProvider>
       </body>
     </html>
   );

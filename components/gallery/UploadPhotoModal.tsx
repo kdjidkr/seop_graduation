@@ -56,36 +56,36 @@ export function UploadPhotoModal({ isOpen, onClose }: { isOpen: boolean; onClose
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/50 z-50 backdrop-blur-sm"
+                        className="fixed inset-0 bg-black/60 z-[130] backdrop-blur-sm"
                     />
 
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none p-4"
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        className="fixed inset-0 flex items-center justify-center z-[140] pointer-events-none p-4"
                     >
-                        <div className="bg-paper w-full max-w-md rounded-2xl shadow-2xl p-6 md:p-8 pointer-events-auto relative border-4 border-brown-50">
+                        <div className="bg-white w-full max-w-md p-8 md:p-10 shadow-2xl pointer-events-auto relative font-manseh max-h-[90vh] overflow-y-auto custom-scrollbar">
                             <button
                                 onClick={onClose}
-                                className="absolute top-4 right-4 text-brown-900/50 hover:text-brown-900 transition-colors"
+                                className="absolute top-6 right-6 text-gray-300 hover:text-black transition-colors"
                             >
                                 <X size={24} />
                             </button>
 
-                            <h2 className="text-3xl font-jua text-brown-900 mb-6 text-center">
+                            <h2 className="text-4xl text-gray-900 mb-8 text-center">
                                 추억 공유하기 📸
                             </h2>
 
-                            <form action={handleSubmit} className="space-y-4">
+                            <form action={handleSubmit} className="space-y-6">
                                 <div className="flex justify-center">
-                                    <label className="cursor-pointer w-full h-48 border-2 border-dashed border-brown-300 rounded-xl flex flex-col items-center justify-center bg-white/50 hover:bg-white transition-colors relative overflow-hidden">
+                                    <label className="cursor-pointer w-full h-56 border-2 border-dashed border-gray-200 hover:border-black rounded-xl flex flex-col items-center justify-center bg-gray-50/50 hover:bg-white transition-all relative overflow-hidden group">
                                         {previewUrl ? (
                                             <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
                                         ) : (
                                             <>
-                                                <ImageIcon size={32} className="text-brown-400 mb-2" />
-                                                <span className="font-gamja text-brown-900/60">사진 선택 (최대 5MB)</span>
+                                                <ImageIcon size={40} className="text-gray-300 group-hover:text-black transition-colors mb-2" />
+                                                <span className="text-xl text-gray-400 group-hover:text-black transition-colors">사진을 선택해주세요</span>
                                             </>
                                         )}
                                         <input
@@ -99,49 +99,53 @@ export function UploadPhotoModal({ isOpen, onClose }: { isOpen: boolean; onClose
                                     </label>
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-gamja text-brown-900/70 mb-1">작성자 이름</label>
-                                    <input
-                                        name="author_name"
-                                        required
-                                        maxLength={20}
-                                        className="w-full bg-white border border-brown-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brown-500 font-gamja text-lg"
-                                        placeholder="이름을 입력해주세요"
-                                    />
-                                </div>
+                                <div className="space-y-4 flex flex-col items-end">
+                                    <div className="flex items-center gap-2 border-b border-gray-200 w-full">
+                                        <span className="shrink-0 text-xl text-gray-400">- 이름</span>
+                                        <input
+                                            name="author_name"
+                                            required
+                                            maxLength={20}
+                                            className="w-full bg-transparent px-2 py-2 focus:outline-none text-2xl text-right"
+                                            placeholder="누구"
+                                        />
+                                    </div>
 
-                                <div>
-                                    <label className="block text-sm font-gamja text-brown-900/70 mb-1">설명 (선택)</label>
-                                    <input
-                                        name="caption"
-                                        maxLength={50}
-                                        className="w-full bg-white border border-brown-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brown-500 font-gamja text-lg"
-                                        placeholder="사진에 대한 설명"
-                                    />
+                                    <div className="flex items-center gap-2 border-b border-gray-200 w-full">
+                                        <span className="shrink-0 text-xl text-gray-400">- 한줄평</span>
+                                        <input
+                                            name="caption"
+                                            maxLength={50}
+                                            className="w-full bg-transparent px-2 py-2 focus:outline-none text-2xl text-right"
+                                            placeholder="사진에 대한 추억..."
+                                        />
+                                    </div>
                                 </div>
 
                                 {error && (
-                                    <div className="text-center text-red-500 text-sm font-gamja">
+                                    <div className="text-center text-red-500 text-lg">
                                         ⚠️ {error}
                                     </div>
                                 )}
 
-                                <button
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className={cn(
-                                        "w-full bg-brown-900 text-paper rounded-xl py-3 font-jua text-xl shadow-lg flex items-center justify-center gap-2 transition-transform active:scale-95 hover:bg-brown-800",
-                                        isSubmitting && "opacity-70 cursor-not-allowed"
-                                    )}
-                                >
-                                    {isSubmitting ? (
-                                        "업로드 중..."
-                                    ) : (
-                                        <>
-                                            업로드 <Upload size={20} />
-                                        </>
-                                    )}
-                                </button>
+                                <div className="pt-4">
+                                    <motion.button
+                                        whileHover={{ scale: 1.05, y: -2 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        type="submit"
+                                        disabled={isSubmitting}
+                                        className={cn(
+                                            "w-full text-4xl text-gray-900 transition-colors hover:text-blue-600",
+                                            isSubmitting && "opacity-50 cursor-not-allowed"
+                                        )}
+                                    >
+                                        {isSubmitting ? (
+                                            <div className="w-10 h-10 border-4 border-gray-900 border-t-transparent rounded-full animate-spin mx-auto" />
+                                        ) : (
+                                            "업로드하기"
+                                        )}
+                                    </motion.button>
+                                </div>
                             </form>
                         </div>
                     </motion.div>

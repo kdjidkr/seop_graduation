@@ -17,6 +17,11 @@ create table public.gifts (
   id uuid default uuid_generate_v4() primary key,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   name text not null,
+  sender_name text,
+  password text,
+  expires_at timestamp with time zone,
+  barcode_number text,
+  is_public boolean default true,
   image_url text,
   selected_by_brother boolean default false
 );
@@ -27,7 +32,9 @@ create table public.photos (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   storage_path text not null,
   author_name text,
-  caption text
+  caption text,
+  password text,
+  is_public boolean default true
 );
 
 -- 4. App Config Table (for Admin settings)
@@ -56,3 +63,10 @@ create policy "Enable update for all users" on public.gifts for update using (tr
 
 create policy "Enable read access for all users" on public.photos for select using (true);
 create policy "Enable insert for all users" on public.photos for insert with check (true);
+create policy "Enable update for all users" on public.photos for update using (true);
+create policy "Enable delete for all users" on public.photos for delete using (true);
+
+create policy "Enable delete for all users" on public.letters for delete using (true);
+
+create policy "Enable insert for all users" on public.gifts for insert with check (true);
+create policy "Enable delete for all users" on public.gifts for delete using (true);
