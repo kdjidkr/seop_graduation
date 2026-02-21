@@ -24,7 +24,7 @@ const manseh = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Congratulations Seungseop!",
+  title: "섭승이 대졸 프로젝트",
   description: "Graduation Celebration",
 };
 

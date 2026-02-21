@@ -386,7 +386,7 @@ export function FourCutModal({ isOpen, onClose }: FourCutModalProps) {
                                 <div className="w-full flex flex-col items-center space-y-10 py-4">
                                     {/* Collage Preview */}
                                     <div className="w-full max-w-[420px] aspect-[2/3] bg-white shadow-2xl relative border-8 border-gray-50 overflow-hidden flex-shrink-0">
-                                        <img src="/photo_booth/frame.jpeg?v=1" className="w-full h-full object-contain" />
+                                        <img src="/photo_booth/frame.JPEG?v=1" className="w-full h-full object-contain" />
                                         {photos.map((photo, index) => {
                                             const config = SLOT_CONFIG[index];
                                             return (
