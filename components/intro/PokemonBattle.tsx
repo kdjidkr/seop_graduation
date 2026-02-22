@@ -228,7 +228,7 @@ export function PokemonBattle({ onComplete }: { onComplete: () => void }) {
 
                     // 2. Fill Bar to 100% (Animated)
                     setExpPercent(100);
-                    await new Promise((r) => setTimeout(r, 800)); // Wait for fill animation
+                    await new Promise((r) => setTimeout(r, 400)); // Wait for fill animation
 
                     // 3. Level Up Stats & Sound
                     setCyndaquilLevel(i);
@@ -237,11 +237,11 @@ export function PokemonBattle({ onComplete }: { onComplete: () => void }) {
 
                     playSfx('levelup.mp3');
 
-                    // 4. Pause for 1s with FULL BAR
-                    await new Promise((r) => setTimeout(r, 1000));
+                    // 4. Pause for 0.4s with FULL BAR
+                    await new Promise((r) => setTimeout(r, 400));
 
                     // Small pause before next loop reset
-                    await new Promise((r) => setTimeout(r, 200));
+                    await new Promise((r) => setTimeout(r, 100));
                 }
                 setIsLeveling(false); // Unblock input
 
